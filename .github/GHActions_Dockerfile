@@ -35,7 +35,7 @@ RUN set -ex && pip install pipenv --upgrade
 
 # INSTALL DEPENDENCIES
 COPY Pipfile* ./
-RUN set -ex && pipenv install --system
+RUN set -ex && pipenv lock -r > req.txt && pip install -r req.txt
 
 FROM builder as final
 ENV PYTHONUNBUFFERED=1
