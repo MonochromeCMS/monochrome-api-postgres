@@ -13,7 +13,7 @@ echo "Upgrading the database..."
 cd /api
 alembic upgrade head
 
-cd /
+cd -
 if [ "$1" = "create_admin" ]; then
   echo "Creating an admin user..."
   python /api/create_admin.py
