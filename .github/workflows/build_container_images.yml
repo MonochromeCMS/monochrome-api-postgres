@@ -1,13 +1,13 @@
 name: Create and publish a Docker image
 
 on:
-  push:
-    branches: ['release']
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
   BASE_IMAGE: 'python:3-slim'
-  BASE_IMAGE_PLATFORMS: 'linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,linux/mips64le,linux/ppc64le,linux/s390x'
+  BASE_IMAGE_PLATFORMS: 'linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8,linux/mips64le,linux/ppc64le,linux/s390x'
 
 jobs:
   build-and-push-image:
@@ -44,14 +44,14 @@ jobs:
       - name: Get release metadata
         id: get_release_metadata
         run: |
-          release_tag={{ steps.get_release.outputs.tag_name }}
+          release_tag=${{ steps.get_release.outputs.tag_name }}
           release_version=$(echo $release_tag | cut -c2-)
-          image_name=$(echo {{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          image_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           echo "::set-output name=release_version::$release_version"
           echo "::set-output name=release_tag::$release_tag"
-          echo "::set-output name=image_name::image_name"
+          echo "::set-output name=image_name::$image_name"
           release_commit=$(git rev-list --count HEAD)
-          echo "::set-output name=release_commit::release_commit"
+          echo "::set-output name=release_commit::$release_commit"
           build_date=$(date "+%F")
           echo "::set-output name=build_date::$build_date"
 
@@ -70,7 +70,7 @@ jobs:
             GIT_COMMIT=${{ steps.get_release_metadata.outputs.release_commit }}
             RELEASE_TAG=${{ steps.get_release_metadata.outputs.release_tag }}
           tags: |
-            ghcr.io/${{ steps.get_release_metadata.image_name }}:latest
-            ghcr.io/${{ steps.get_release_metadata.image_name }}:${{ steps.get_release_metadata.outputs.release_tag }}
+            ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:latest
+            ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:${{ steps.get_release_metadata.outputs.release_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
