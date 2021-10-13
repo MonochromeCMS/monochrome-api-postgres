@@ -13,7 +13,7 @@ The database needs to be set up, and an admin user created:
 ```shell
 docker run                                                          \
   -e DB_URL=postgresql+asyncpg://postgres:postgres@db:5432/postgres \
-  ghcr.io/monochromeCMS/monochrome-api-postgres:latest              \
+  ghcr.io/monochromecms/monochrome-api-postgres:latest              \
   create_admin
 ```
 Once done, the image can be launched with the required [env. vars](#environment-variables):
@@ -22,7 +22,7 @@ docker run -p 3000:3000                                             \
   -e DB_URL=postgresql+asyncpg://postgres:postgres@db:5432/postgres \
   -e JWT_SECRET_KEY=changeMe                                        \
   -v "$(pwd)/media:/media"                                          \
-  ghcr.io/monochromeCMS/monochrome-api-postgres:latest
+  ghcr.io/monochromecms/monochrome-api-postgres:latest
 ```
 *The images will be saved in the media_path, so a volume is highly recommended.*
 ### Makefile
@@ -94,9 +94,6 @@ TEMP_PATH = "/temp"
 MAX_PAGE_LIMIT = 50
 ```
 
-## Testing
-- `make test` Launches the tests
-
 ## Tools used
 * FastAPI
 * SQLAlchemy
@@ -109,8 +106,8 @@ MAX_PAGE_LIMIT = 50
 * OpenAPI 🟡66%
 * Cleaner code 🟡50%
 * Testing 🟠40%
-* Unit 🟢100%
-* Integration 🔴10%
+  * Unit 🟢100%
+  * Integration 🔴10%
   
 Credits:
 * Base API template: https://github.com/grillazz/fastapi-sqlalchemy-asyncpg
