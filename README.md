@@ -1,7 +1,7 @@
 # Monochrome
 Monochrome's API, implemented with a PostgreSQL backend and FS image storage.
 
-Most users will prefer the Monochrome full stack, which contains the API, the frontend and the backend.
+Most users will prefer the [Monochrome full stack](https://github.com/MonochromeCMS/Monochrome), which contains the API, the frontend and the backend.
 
 ## Usage
 ### Docker
