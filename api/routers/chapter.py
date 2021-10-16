@@ -14,14 +14,14 @@ from ..models.chapter import Chapter
 from ..schemas.chapter import ChapterSchema, ChapterResponse, LatestChaptersResponse, DetailedChapterResponse
 
 
-global_settings = get_settings()
+settings = get_settings()
 
 router = APIRouter(prefix="/chapter", tags=["Chapter"])
 
 
 @router.get("", response_model=LatestChaptersResponse)
 async def get_latest_chapters(
-    limit: Optional[int] = Query(10, ge=1, le=100),
+    limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
     offset: Optional[int] = Query(0, ge=0),
     db_session: AsyncSession = Depends(get_db),
 ):
@@ -71,8 +71,8 @@ delete_responses = {
 @router.delete("/{id}", dependencies=[Depends(is_connected)], responses=delete_responses)
 async def delete_chapter(id: UUID, db_session: AsyncSession = Depends(get_db)):
     chapter = await Chapter.find(db_session, id, NotFoundHTTPException("Chapter not found"))
-    shutil.rmtree(os.path.join(global_settings.media_path, str(chapter.manga_id), str(chapter.id)), True)
-    return await Chapter.delete(chapter, db_session)
+    shutil.rmtree(os.path.join(settings.media_path, str(chapter.manga_id), str(chapter.id)), True)
+    return await chapter.delete(db_session)
 
 
 put_responses = {

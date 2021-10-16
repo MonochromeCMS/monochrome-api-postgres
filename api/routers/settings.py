@@ -1,6 +1,4 @@
-import os
-import json
-
+from os import path
 from fastapi import APIRouter, Depends
 
 from .auth import is_connected, auth_responses
@@ -10,7 +8,6 @@ from ..schemas.settings import SettingsSchema
 
 
 global_settings = get_settings()
-settings_path = os.path.join(global_settings.media_path, "settings.json")
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
 

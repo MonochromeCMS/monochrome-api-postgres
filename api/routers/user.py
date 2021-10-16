@@ -4,12 +4,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..config import get_settings
 from ..exceptions import NotFoundHTTPException, BadRequestHTTPException
 from ..db import get_db
 from .auth import is_connected, get_password_hash, auth_responses
 from ..models.user import User
 from ..schemas.user import UserSchema, UserResponse, UsersResponse
 
+settings = get_settings()
 
 router = APIRouter(
     prefix="/user",
@@ -48,7 +50,7 @@ get_responses = {
 
 @router.get("/{id}", response_model=UserResponse, responses=get_responses)
 async def get_user(id: UUID, db_session: AsyncSession = Depends(get_db)):
-    """Provides information about an user."""
+    """Provides information about a user."""
     user = await User.find(db_session, id, NotFoundHTTPException("User not found"))
 
     return user
@@ -149,7 +151,7 @@ get_all_responses = {
 
 @router.get("", response_model=UsersResponse, responses=get_all_responses)
 async def get_users(
-    limit: Optional[int] = Query(10, ge=1, le=100),
+    limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
     offset: Optional[int] = Query(0, ge=0),
     db_session: AsyncSession = Depends(get_db),
 ):

@@ -88,7 +88,7 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60
 # Path where the images will be stored
 MEDIA_PATH = "/media"
 # Path where temporary data will be stored
-TEMP_PATH = "/temp"
+TEMP_PATH = "/tmp"
 
 # For pagination, the maximum of elements per request, has to be positive
 MAX_PAGE_LIMIT = 50

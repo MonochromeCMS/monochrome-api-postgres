@@ -63,6 +63,8 @@ async def begin_upload_session(
         chapter = await Chapter.find(db_session, payload.chapter_id, NotFoundHTTPException("Chapter not found"))
         if chapter.manga_id != payload.manga_id:
             raise BadRequestHTTPException("The provided chapter doesn't belong to this manga")
+    else:
+        chapter = None
 
     session = UploadSession(**payload.dict())
     await session.save(db_session)
@@ -71,7 +73,7 @@ async def begin_upload_session(
     makedirs(path.join(session_path, "zip"))
     makedirs(path.join(session_path, "files"))
 
-    if payload.chapter_id:
+    if chapter:
         blobs = []
         for i in range(1, chapter.length + 1):
             blob = UploadedBlob(session_id=session.id, name=f"{i}.jpg")
@@ -108,7 +110,7 @@ async def get_upload_session(
     return session
 
 
-def save_session_image(files: Iterable[Tuple[str, str]]):
+def save_session_image(files: Iterable[Tuple[UUID, str]]):
     for blob_id, file in files:
         im = Image.open(file)
         im.convert("RGB").save(path.join(global_settings.media_path, "blobs", f"{blob_id}.jpg"))

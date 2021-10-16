@@ -44,12 +44,11 @@ up-db: ## Start a db container
 down-db: ## Stop the db container
 	-docker stop monochrome-db
 
-
 .PHONY: logs
 logs:	## Read the container's logs
 	docker logs -f --tail 500 monochrome-api
 
-.PHONY: sh-%
+.PHONY: sh
 sh: ## Open a shell in the running container
 	docker -ti exec monochrome-api sh
 

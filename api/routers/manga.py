@@ -18,7 +18,7 @@ from ..schemas.chapter import ChapterResponse
 from ..schemas.manga import MangaSchema, MangaResponse, MangaSearchResponse
 
 
-global_settings = get_settings()
+settings = get_settings()
 
 router = APIRouter(prefix="/manga", tags=["Manga"])
 
@@ -42,14 +42,14 @@ post_responses = {
 async def create_manga(payload: MangaSchema, db_session: AsyncSession = Depends(get_db)):
     manga = Manga(**payload.dict())
     await manga.save(db_session)
-    os.mkdir(os.path.join(global_settings.media_path, str(manga.id)))
+    os.mkdir(os.path.join(settings.media_path, str(manga.id)))
     return manga
 
 
 @router.get("", response_model=MangaSearchResponse)
 async def search_manga(
     title: str = "",
-    limit: Optional[int] = Query(10, ge=1, le=100),
+    limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
     offset: Optional[int] = Query(0, ge=0),
     db_session: AsyncSession = Depends(get_db),
 ):
@@ -117,8 +117,8 @@ delete_responses = {
 @router.delete("/{id}", dependencies=[Depends(is_connected)], responses=delete_responses)
 async def delete_manga(id: UUID, db_session: AsyncSession = Depends(get_db)):
     manga = await Manga.find(db_session, id, NotFoundHTTPException("Manga not found"))
-    shutil.rmtree(os.path.join(global_settings.media_path, str(manga.id)))
-    return await Manga.delete(manga, db_session)
+    shutil.rmtree(os.path.join(settings.media_path, str(manga.id)))
+    return await manga.delete(db_session)
 
 
 put_responses = {
@@ -144,7 +144,7 @@ async def update_manga(
 
 def save_cover(manga_id: UUID, file: File):
     im = Image.open(file)
-    im.convert("RGB").save(os.path.join(global_settings.media_path, str(manga_id), "cover.jpg"))
+    im.convert("RGB").save(os.path.join(settings.media_path, str(manga_id), "cover.jpg"))
 
 
 put_cover_responses = {
