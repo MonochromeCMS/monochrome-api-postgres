@@ -1,5 +1,6 @@
 import uuid
 
+from fastapi_permissions import Allow, Everyone
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func, select, Float, Boolean
 from sqlalchemy.orm import relationship, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,6 +24,20 @@ class Chapter(Base):
     sessions = relationship("UploadSession", back_populates="chapter", cascade="all, delete", passive_deletes=True)
 
     __mapper_args__ = {"eager_defaults": True}
+
+    @property
+    def __acl__(self):
+        return (
+            *self.__class_acl__(),
+            (Allow, ["role:uploader", f"user:{self.owner_id}"], "edit"),
+        )
+
+    @classmethod
+    def __class_acl__(cls):
+        return (
+            (Allow, [Everyone], "view"),
+            (Allow, ["role:admin"], "edit"),
+        )
 
     @classmethod
     async def latest(cls, db_session: AsyncSession, limit: int = 20, offset: int = 0):

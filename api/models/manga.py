@@ -1,7 +1,8 @@
 import uuid
 import enum
 
-from sqlalchemy import Column, String, select, Numeric, Enum, DateTime, func
+from fastapi_permissions import Allow, Everyone
+from sqlalchemy import Column, String, select, Numeric, Enum, DateTime, func, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,6 +31,22 @@ class Manga(Base):
     sessions = relationship("UploadSession", back_populates="manga", cascade="all, delete", passive_deletes=True)
 
     __mapper_args__ = {"eager_defaults": True}
+
+    @property
+    def __acl__(self):
+        return (
+            *self.__class_acl__(),
+            (Allow, ["role:uploader", f"user:{self.owner_id}"], "edit"),
+        )
+
+    @classmethod
+    def __class_acl__(cls):
+        return (
+            (Allow, [Everyone], "view"),
+            (Allow, ["role:admin"], "edit"),
+            (Allow, ["role:admin"], "create"),
+            (Allow, ["role:uploader"], "create"),
+        )
 
     @classmethod
     async def search(cls, db_session: AsyncSession, title: str, limit: int = 20, offset: int = 0):

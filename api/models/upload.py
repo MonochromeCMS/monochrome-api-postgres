@@ -1,5 +1,6 @@
 import uuid
 
+from fastapi_permissions import Allow, Everyone
 from sqlalchemy import Column, ForeignKey, delete, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
@@ -16,6 +17,23 @@ class UploadSession(Base):
     manga = relationship("Manga", back_populates="sessions")
     chapter = relationship("Chapter", back_populates="sessions")
     blobs = relationship("UploadedBlob", back_populates="session", cascade="all, delete", passive_deletes=True)
+
+    @property
+    def __acl__(self):
+        return (
+            *self.__class_acl__(),
+            (Allow, ["role:uploader", f"user:{self.owner_id}"], "view"),
+            (Allow, ["role:uploader", f"user:{self.owner_id}"], "edit"),
+        )
+
+    @classmethod
+    def __class_acl__(cls):
+        return (
+            (Allow, ["role:admin"], "create"),
+            (Allow, ["role:uploader"], "create"),
+            (Allow, ["role:admin"], "view"),
+            (Allow, ["role:admin"], "edit"),
+        )
 
     @classmethod
     async def flush(cls, db_session: AsyncSession):
