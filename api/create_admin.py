@@ -26,9 +26,9 @@ async def main():
 
     conn = await asyncpg.connect(DB_URL)
 
-    query = """INSERT INTO "user" (version, id, username, hashed_password) VALUES(1, $1, $2, $3);"""
+    query = """INSERT INTO "user" (version, id, username, hashed_password, role) VALUES(1, $1, $2, $3, $4);"""
 
-    await conn.execute(query, uuid, USERNAME, hashed_password)
+    await conn.execute(query, uuid, USERNAME, hashed_password, "admin")
 
     await conn.close()
 
