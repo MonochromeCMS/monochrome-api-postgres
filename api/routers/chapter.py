@@ -56,9 +56,7 @@ get_responses = {
 
 
 @router.get("/{chapter_id}", response_model=DetailedChapterResponse, responses=get_responses)
-async def get_chapter(
-    chapter: Chapter = Permission("view", _get_detailed_chapter)
-):
+async def get_chapter(chapter: Chapter = Permission("view", _get_detailed_chapter)):
     return chapter
 
 
@@ -78,8 +76,7 @@ delete_responses = {
 
 @router.delete("/{chapter_id}", responses=delete_responses)
 async def delete_chapter(
-    chapter: Chapter = Permission("edit", _get_chapter),
-    db_session: AsyncSession = Depends(get_db)
+    chapter: Chapter = Permission("edit", _get_chapter), db_session: AsyncSession = Depends(get_db)
 ):
     shutil.rmtree(os.path.join(settings.media_path, str(chapter.manga_id), str(chapter.id)), True)
     return await chapter.delete(db_session)

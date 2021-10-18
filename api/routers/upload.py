@@ -114,9 +114,7 @@ get_responses = {
 }
 
 
-@router.get(
-    "/{session_id}", response_model=UploadSessionResponse, responses=get_responses
-)
+@router.get("/{session_id}", response_model=UploadSessionResponse, responses=get_responses)
 async def get_upload_session(session=Permission("view", _get_upload_session_blobs)):
     return session
 

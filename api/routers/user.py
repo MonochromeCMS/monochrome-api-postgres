@@ -104,9 +104,7 @@ delete_responses = {
 
 
 @router.delete("/{user_id}", responses=delete_responses)
-async def delete_user(
-        user: User = Permission("edit", _get_user), db_session: AsyncSession = Depends(get_db)
-):
+async def delete_user(user: User = Permission("edit", _get_user), db_session: AsyncSession = Depends(get_db)):
     return await user.delete(db_session)
 
 
