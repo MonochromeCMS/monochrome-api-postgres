@@ -127,9 +127,7 @@ delete_responses = {
 
 
 @router.delete("/{manga_id}", responses=delete_responses)
-async def delete_manga(
-    manga: Manga = Permission("edit", _get_manga), db_session: AsyncSession = Depends(get_db)
-):
+async def delete_manga(manga: Manga = Permission("edit", _get_manga), db_session: AsyncSession = Depends(get_db)):
     shutil.rmtree(os.path.join(settings.media_path, str(manga.id)))
     return await manga.delete(db_session)
 
