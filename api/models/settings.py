@@ -1,6 +1,7 @@
 import os
 import json
 
+from ..fastapi_permissions import Allow, Everyone
 from ..config import get_settings
 from ..schemas.settings import SettingsSchema
 
@@ -11,6 +12,11 @@ settings_path = os.path.join(global_settings.media_path, "settings.json")
 
 class Settings:
     custom_settings = None
+
+    __acl__ = (
+        (Allow, [Everyone], "view"),
+        (Allow, [f"role:admin"], "edit"),
+    )
 
     def __init__(self):
         try:
