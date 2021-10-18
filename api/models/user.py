@@ -1,7 +1,8 @@
 import uuid
 import enum
 
-from sqlalchemy import Column, String, select, or_, func
+from ..fastapi_permissions import Allow, Authenticated
+from sqlalchemy import Column, String, select, or_, func, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +25,22 @@ class User(Base):
     @property
     def principals(self):
         return [f"user:{self.id}", f"role:{self.role}"]
+
+    @property
+    def __acl__(self):
+        return (
+            *self.__class_acl__(),
+            (Allow, [f"user:{self.id}"], "view"),
+            (Allow, [f"user:{self.id}"], "edit"),
+        )
+
+    @classmethod
+    def __class_acl__(cls):
+        return (
+            (Allow, ["role:admin"], "create"),
+            (Allow, ["role:admin"], "view"),
+            (Allow, ["role:admin"], "edit"),
+        )
 
     @classmethod
     async def from_username_email(
