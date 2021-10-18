@@ -16,8 +16,8 @@ class UploadSessionSchema(CamelModel):
     class Config:
         schema_extra = {
             "example": {
-                "manga_id": "1e01d7f6-c4e1-4102-9dd0-a6fccc065978",
-                "chapter_id": "116bdaa6-f62d-4b53-98b2-237adbaad788",
+                "mangaId": "1e01d7f6-c4e1-4102-9dd0-a6fccc065978",
+                "chapterId": "116bdaa6-f62d-4b53-98b2-237adbaad788",
             }
         }
 
@@ -29,6 +29,7 @@ class UploadedBlobResponse(CamelModel):
     name: str = Field(
         description="Name the blob was uploaded as",
     )
+    owner_id: Optional[UUID] = Field(description="User that created this upload session")
 
     class Config:
         orm_mode = True
@@ -36,6 +37,7 @@ class UploadedBlobResponse(CamelModel):
             "example": {
                 "id": "eadec6fe-619f-4d7f-8328-f8a5563d3325",
                 "name": "001.png",
+                "ownerId": "6901d7f6-c4e1-4200-9dd0-a6fccc065978",
             }
         }
 

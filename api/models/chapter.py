@@ -10,6 +10,7 @@ from .base import Base
 
 class Chapter(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_chapter_owner"))
     name = Column(String, nullable=False)
     scan_group = Column(String, nullable=False)
     volume = Column(Integer, nullable=True)
