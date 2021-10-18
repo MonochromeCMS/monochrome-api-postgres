@@ -8,11 +8,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .base import Base
 
 
+class Role(str, enum.Enum):
+    admin = "admin"
+    uploader = "uploader"
+    user = "user"
+
+
 class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    role = Column(Enum(Role), nullable=False, default=Role.user)
     username = Column(String(15), nullable=False, unique=True)
     email = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
+
+    @property
+    def principals(self):
+        return [f"user:{self.id}", f"role:{self.role}"]
 
     @classmethod
     async def from_username_email(
