@@ -61,7 +61,10 @@ class Base:
         result = await db_session.execute(stmt)
         instance = result.scalars().first()
         if instance is None:
-            raise exception
+            if exception:
+                raise exception
+            else:
+                return None
         else:
             return instance
 
