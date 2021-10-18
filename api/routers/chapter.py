@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import is_connected, auth_responses
+from .auth import is_connected, auth_responses, Permission
 from ..exceptions import NotFoundHTTPException
 from ..config import get_settings
 from ..db import get_db
@@ -19,10 +19,19 @@ settings = get_settings()
 router = APIRouter(prefix="/chapter", tags=["Chapter"])
 
 
+async def _get_chapter(chapter_id: UUID, db_session: AsyncSession = Depends(get_db)):
+    return await Chapter.find(db_session, chapter_id, NotFoundHTTPException("Chapter not found"))
+
+
+async def _get_detailed_chapter(chapter_id: UUID, db_session: AsyncSession = Depends(get_db)):
+    return await Chapter.find_rel(db_session, chapter_id, Chapter.manga, NotFoundHTTPException("Chapter not found"))
+
+
 @router.get("", response_model=LatestChaptersResponse)
 async def get_latest_chapters(
     limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
     offset: Optional[int] = Query(0, ge=0),
+    _: Chapter = Permission("view", Chapter.__class_acl__),
     db_session: AsyncSession = Depends(get_db),
 ):
     count, page = await Chapter.latest(db_session, limit, offset)
@@ -46,12 +55,11 @@ get_responses = {
 }
 
 
-@router.get("/{id}", response_model=DetailedChapterResponse, responses=get_responses)
+@router.get("/{chapter_id}", response_model=DetailedChapterResponse, responses=get_responses)
 async def get_chapter(
-    id: UUID,
-    db_session: AsyncSession = Depends(get_db),
+    chapter: Chapter = Permission("view", _get_detailed_chapter)
 ):
-    return await Chapter.find_rel(db_session, id, Chapter.manga, NotFoundHTTPException("Chapter not found"))
+    return chapter
 
 
 delete_responses = {
@@ -68,9 +76,11 @@ delete_responses = {
 }
 
 
-@router.delete("/{id}", dependencies=[Depends(is_connected)], responses=delete_responses)
-async def delete_chapter(id: UUID, db_session: AsyncSession = Depends(get_db)):
-    chapter = await Chapter.find(db_session, id, NotFoundHTTPException("Chapter not found"))
+@router.delete("/{chapter_id}", responses=delete_responses)
+async def delete_chapter(
+    chapter: Chapter = Permission("edit", _get_chapter),
+    db_session: AsyncSession = Depends(get_db)
+):
     shutil.rmtree(os.path.join(settings.media_path, str(chapter.manga_id), str(chapter.id)), True)
     return await chapter.delete(db_session)
 
@@ -85,12 +95,11 @@ put_responses = {
 }
 
 
-@router.put("/{id}", response_model=ChapterResponse, dependencies=[Depends(is_connected)], responses=put_responses)
+@router.put("/{chapter_id}", response_model=ChapterResponse, responses=put_responses)
 async def update_chapter(
     payload: ChapterSchema,
-    id: UUID,
+    chapter: Chapter = Permission("edit", _get_chapter),
     db_session: AsyncSession = Depends(get_db),
 ):
-    chapter = await Chapter.find(db_session, id, NotFoundHTTPException("Chapter not found"))
     await chapter.update(db_session, **payload.dict())
     return chapter
