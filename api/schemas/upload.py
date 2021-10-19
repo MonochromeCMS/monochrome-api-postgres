@@ -29,7 +29,6 @@ class UploadedBlobResponse(CamelModel):
     name: str = Field(
         description="Name the blob was uploaded as",
     )
-    owner_id: Optional[UUID] = Field(description="User that created this upload session")
 
     class Config:
         orm_mode = True
@@ -37,7 +36,6 @@ class UploadedBlobResponse(CamelModel):
             "example": {
                 "id": "eadec6fe-619f-4d7f-8328-f8a5563d3325",
                 "name": "001.png",
-                "ownerId": "6901d7f6-c4e1-4200-9dd0-a6fccc065978",
             }
         }
 
@@ -50,6 +48,7 @@ class UploadSessionResponse(UploadSessionSchema):
         [],
         description="Images uploaded to the session",
     )
+    owner_id: Optional[UUID] = Field(description="User that created this upload session")
 
     class Config:
         orm_mode = True
