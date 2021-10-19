@@ -1,12 +1,12 @@
 import uuid
 
-from fastapi_permissions import Allow, Everyone
 from sqlalchemy import Column, ForeignKey, delete, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import Base
+from ..fastapi_permissions import Allow, Everyone
 
 
 class UploadSession(Base):
