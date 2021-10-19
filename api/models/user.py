@@ -1,12 +1,12 @@
 import uuid
 import enum
 
-from ..fastapi_permissions import Allow, Authenticated
 from sqlalchemy import Column, String, select, or_, func, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import Base
+from ..fastapi_permissions import Allow, Authenticated
 
 
 class Role(str, enum.Enum):
