@@ -15,7 +15,7 @@ class Settings:
 
     __acl__ = (
         (Allow, [Everyone], "view"),
-        (Allow, [f"role:admin"], "edit"),
+        (Allow, ["role:admin"], "edit"),
     )
 
     def __init__(self):
