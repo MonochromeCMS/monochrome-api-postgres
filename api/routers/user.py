@@ -9,8 +9,8 @@ from ..exceptions import NotFoundHTTPException, BadRequestHTTPException
 from ..db import get_db
 from .auth import is_connected, get_password_hash, auth_responses, Permission, get_active_principals
 from ..fastapi_permissions import has_permission
-from ..models.user import User
-from ..schemas.user import UserSchema, UserResponse, UsersResponse
+from ..models.user import User, Role
+from ..schemas.user import UserSchema, UserResponse, UsersResponse, UserFilters
 
 settings = get_settings()
 
@@ -158,13 +158,19 @@ get_all_responses = {
 
 
 @router.get("", response_model=UsersResponse, responses=get_all_responses)
-async def get_users(
+async def search_users(
     limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
     offset: Optional[int] = Query(0, ge=0),
+    username: str = "",
+    role: Optional[Role] = None,
+    email: Optional[str] = None,
+    user_id: Optional[UUID] = None,
     _: User = Permission("view", User.__class_acl__),
     db_session: AsyncSession = Depends(get_db),
 ):
-    count, page = await User.all(db_session, limit, offset)
+    count, page = await User.search(
+        db_session, username, UserFilters(role=role, email=email, id=user_id), limit, offset
+    )
 
     return {
         "offset": offset,
