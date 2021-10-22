@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import Base
-from ..fastapi_permissions import Allow, Authenticated
+from ..fastapi_permissions import Allow, Everyone
 
 
 class Role(str, enum.Enum):
@@ -39,6 +39,7 @@ class User(Base):
     @classmethod
     def __class_acl__(cls):
         return (
+            (Allow, [Everyone], "register"),
             (Allow, ["role:admin"], "create"),
             (Allow, ["role:admin"], "view"),
             (Allow, ["role:admin"], "edit"),
