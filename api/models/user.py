@@ -1,7 +1,9 @@
 import uuid
 import enum
 
-from sqlalchemy import Column, String, select, or_, func, Enum
+from typing import Union
+from pydantic import BaseModel
+from sqlalchemy import Column, String, select, or_, and_, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -60,5 +62,16 @@ class User(Base):
         return result.scalars().first()
 
     @classmethod
-    async def all(cls, db_session: AsyncSession, limit: int = 20, offset: int = 0):
-        return await cls.pagination(db_session, select(cls), limit, offset, (cls.username,))
+    async def search(
+        cls,
+        db_session: AsyncSession,
+        name: str = "",
+        filters: Union[BaseModel, None] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ):
+        stmt = select(cls).where(cls.username.ilike(f"%{name}%"))
+        if filters is not None:
+            filters = {k: v for k, v in filters.dict().items() if v}
+            stmt = stmt.where(and_(True, *[getattr(cls, k) == v for k, v in filters.items()]))
+        return await cls.pagination(db_session, stmt, limit, offset, (cls.username,))
