@@ -1,7 +1,6 @@
-from os import path
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from .auth import is_connected, auth_responses, Permission
+from .auth import auth_responses, Permission
 from ..config import get_settings
 from ..models.settings import Settings
 from ..schemas.settings import SettingsSchema

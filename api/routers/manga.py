@@ -5,7 +5,7 @@ from PIL import Image
 
 from uuid import UUID
 from typing import Optional, List
-from fastapi import APIRouter, Depends, status, Query, File, UploadFile, BackgroundTasks
+from fastapi import APIRouter, Depends, status, Query, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .auth import get_connected_user, auth_responses, Permission, get_active_principals
