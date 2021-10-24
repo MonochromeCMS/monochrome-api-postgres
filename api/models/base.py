@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
-from ..exceptions import UnprocessableEntityHTTPException, NotFoundHTTPException, HTTPException
+from ..exceptions import UnprocessableEntityHTTPException, NotFoundHTTPException
 
 
 @as_declarative()

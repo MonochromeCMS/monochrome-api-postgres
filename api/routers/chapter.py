@@ -1,12 +1,12 @@
 import os
 import shutil
 
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import is_connected, auth_responses, Permission
+from .auth import auth_responses, Permission
 from ..exceptions import NotFoundHTTPException
 from ..config import get_settings
 from ..db import get_db

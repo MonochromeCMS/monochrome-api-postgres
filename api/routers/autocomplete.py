@@ -3,7 +3,6 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import is_connected, auth_responses
 from ..db import get_db
 from ..models.chapter import Chapter
 

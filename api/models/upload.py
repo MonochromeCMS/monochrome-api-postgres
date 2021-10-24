@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import Base
-from ..fastapi_permissions import Allow, Everyone
+from ..fastapi_permissions import Allow
 
 
 class UploadSession(Base):
