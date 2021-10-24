@@ -28,9 +28,9 @@ endif
 up start:	## Run a container from the image
 ifneq ($(native),0)
 	@export `grep -v '^#' .env | xargs -d '\n'`
-	hypercorn api.main:app -b 0.0.0.0:3000
+	hypercorn api.main:app -b 0.0.0.0:3000 --reload
 else
-	docker run --rm --name monochrome-api -p 3000:3000 --env-file .env $(tag)
+	docker run --rm --name monochrome-api -p 3000:3000 -v $(MEDIA_PATH):$(MEDIA_PATH) --env-file .env $(tag)
 endif
 
 .PHONY: up-db

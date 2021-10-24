@@ -162,7 +162,7 @@ put_cover_responses = {
     **get_responses,
     400: {
         "description": "The cover isn't a valid image",
-        **BadRequestHTTPException.open_api("image_name is not an image"),
+        **BadRequestHTTPException.open_api("<image_name> is not an image"),
     },
     200: {
         "description": "The edited manga",
@@ -173,12 +173,14 @@ put_cover_responses = {
 
 @router.put("/{manga_id}/cover", responses=put_cover_responses)
 async def set_manga_cover(
-    tasks: BackgroundTasks,
     payload: UploadFile = File(...),
     manga: Manga = Permission("edit", _get_manga),
+    db_session: AsyncSession = Depends(get_db),
 ):
     if not payload.content_type.startswith("image/"):
         raise BadRequestHTTPException(f"'{payload.filename}' is not an image")
 
-    tasks.add_task(save_cover, manga.id, payload.file)
+    save_cover(manga.id, payload.file)
+    await manga.save(db_session)
+
     return manga
