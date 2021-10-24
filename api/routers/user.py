@@ -1,7 +1,9 @@
 from typing import Optional
 from uuid import UUID
+from PIL import Image
+from os import path
 
-from fastapi import APIRouter, Depends, Query, status, Request
+from fastapi import APIRouter, Depends, Query, status, Request, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import get_settings
@@ -161,16 +163,15 @@ if settings.allow_registration:
         },
     }
 
-
     @router.post(
         "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED, responses=register_responses
     )
     @limiter.limit("1/day")
     async def register_user(
-            request: Request,
-            payload: UserRegisterSchema,
-            _: User = Permission("register", User.__class_acl__),
-            db_session: AsyncSession = Depends(get_db),
+        request: Request,
+        payload: UserRegisterSchema,
+        _: User = Permission("register", User.__class_acl__),
+        db_session: AsyncSession = Depends(get_db),
     ):
         hashed_pwd = get_password_hash(payload.password)
 
@@ -215,3 +216,36 @@ async def search_users(
         "results": page,
         "total": count,
     }
+
+
+def save_avatar(user_id: UUID, file: File):
+    im = Image.open(file)
+    im.convert("RGB").save(path.join(settings.media_path, "users", f"{user_id}.jpg"))
+
+
+put_avatar_responses = {
+    **get_responses,
+    400: {
+        "description": "The avatar isn't a valid image",
+        **BadRequestHTTPException.open_api("<image_name> is not an image"),
+    },
+    200: {
+        "description": "The edited user",
+        "model": UserResponse,
+    },
+}
+
+
+@router.put("/{user_id}/avatar", responses=put_avatar_responses)
+async def set_manga_cover(
+    payload: UploadFile = File(...),
+    user: User = Permission("edit", _get_user),
+    db_session: AsyncSession = Depends(get_db),
+):
+    if not payload.content_type.startswith("image/"):
+        raise BadRequestHTTPException(f"'{payload.filename}' is not an image")
+
+    save_avatar(user.id, payload.file)
+    await user.save(db_session)
+
+    return user

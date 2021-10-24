@@ -42,6 +42,7 @@ async def setup_media():
         await UploadSession.flush(session)
 
     rmtree(path.join(global_settings.media_path, "blobs"), ignore_errors=True)
+    makedirs(path.join(global_settings.media_path, "users"), exist_ok=True)
     makedirs(path.join(global_settings.media_path, "blobs"), exist_ok=True)
 
 
