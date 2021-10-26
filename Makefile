@@ -140,7 +140,6 @@ _test_setup: build
 	@echo Setting up the test database...
 	@docker run -d --rm --name monochrome-test-db -e POSTGRES_PASSWORD=postgres -d postgres:13-alpine
 	@sleep 1
-	@$(DOCKER_TEST_RUN) -w /api $(tag) alembic upgrade head
 	@echo Adding the default user...
 	@$(DOCKER_TEST_RUN) -e MONOCHROME_TEST=1 $(tag) create_admin
 
