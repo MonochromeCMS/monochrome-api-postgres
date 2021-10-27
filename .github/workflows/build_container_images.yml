@@ -25,10 +25,6 @@ jobs:
         uses: bruceadams/get-release@v1.2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      
-      - name: Install docker-slim
-        id: install_docker_slim
-        run: curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -66,7 +62,7 @@ jobs:
           context: .
           file: .github/GHActions_Dockerfile
           platforms: ${{ env.BASE_IMAGE_PLATFORMS }}
-          push: false
+          push: true
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE }}
             BUILD_DATE=${{ steps.get_release_metadata.outputs.build_date }}
@@ -74,18 +70,7 @@ jobs:
             GIT_COMMIT=${{ steps.get_release_metadata.outputs.release_commit }}
             RELEASE_TAG=${{ steps.get_release_metadata.outputs.release_tag }}
           tags: |
-            monochrome-api
+            ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:latest
+            ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:${{ steps.get_release_metadata.outputs.release_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      
-      - name: Run docker-slim
-        id: run_docker_slim
-        run: |
-          docker-slim build --compose-file .github/docker-compose.yml --target-compose-svc api
-          docker tag monochrome-api.slim ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:latest
-          docker tag monochrome-api.slim ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}:${{ steps.get_release_metadata.outputs.release_tag }}
-          docker rmi monochrome-api.slim
-      
-      - name: Push images
-        id: push_images
-        run: docker image push -a ghcr.io/${{ steps.get_release_metadata.outputs.image_name }}
