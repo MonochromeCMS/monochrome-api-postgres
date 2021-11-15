@@ -17,7 +17,7 @@ from ..app import limiter
 from ..db import get_db
 from ..config import get_settings
 from ..exceptions import AuthFailedHTTPException, PermissionsHTTPException
-from ..schemas.user import TokenResponse
+from ..schemas.user import TokenResponse, TokenContent, RefreshToken
 from ..models.user import User
 
 
@@ -51,13 +51,12 @@ async def authenticate_user(db_session: AsyncSession, username_mail: str, passwo
         return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
+def create_token(sub: UUID, typ: str, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    to_encode = TokenContent(sub=str(sub), exp=expire, iat=datetime.utcnow(), typ=typ).dict()
     encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
     return encoded_jwt
 
@@ -68,12 +67,30 @@ async def get_connected_user(db_session: AsyncSession = Depends(get_db), token: 
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
         _id: str = payload.get("sub")
-        if _id is None:
+        _type: str = payload.get("typ")
+        if _id is None or _type != "session":
             return None
     except ExpiredSignatureError:
         return None
     except JWTError:
         return None
+    user = await User.find(db_session, UUID(_id), None)
+    return user
+
+
+async def validate_refresh_token(token: str, db_session: AsyncSession):
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        _id: str = payload.get("sub")
+        _type: str = payload.get("typ")
+        if _id is None or _type != "refresh":
+            raise AuthFailedHTTPException("Invalid token")
+    except ExpiredSignatureError:
+        raise AuthFailedHTTPException("Expired token")
+    except JWTError:
+        raise AuthFailedHTTPException("Invalid token")
     user = await User.find(db_session, UUID(_id), None)
     return user
 
@@ -96,6 +113,19 @@ async def get_active_principals(user: User = Depends(get_connected_user)):
 
 Permission = configure_permissions(get_active_principals)
 
+
+def token_response(user: User):
+    access_token_expires = timedelta(minutes=settings.jwt_access_token_expire_minutes)
+    refresh_token_expires = timedelta(days=15)
+    access_token = create_token(sub=user.id, typ="session", expires_delta=access_token_expires)
+    refresh_token = create_token(sub=user.id, typ="refresh", expires_delta=refresh_token_expires)
+    return {
+        "token_type": "bearer",
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }
+
+
 token_responses = {
     200: {"description": "A token for the logged in user", "model": TokenResponse},
     401: {
@@ -106,7 +136,7 @@ token_responses = {
 
 
 @router.post("/token", response_model=TokenResponse, responses=token_responses)
-@limiter.limit("3/minute")
+@limiter.limit("10/minute")
 async def login_for_access_token(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -116,6 +146,11 @@ async def login_for_access_token(
     user = await authenticate_user(db_session, form_data.username, form_data.password)
     if not user:
         raise AuthFailedHTTPException("Wrong username/password")
-    access_token_expires = timedelta(minutes=settings.jwt_access_token_expire_minutes)
-    access_token = create_access_token(data={"sub": str(user.id)}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
+    return token_response(user)
+
+
+@router.post("/refresh", response_model=TokenResponse, responses=token_responses)
+@limiter.limit("1/minute")
+async def refresh_access_token(request: Request, body: RefreshToken, db_session: AsyncSession = Depends(get_db)):
+    user = await validate_refresh_token(body.token, db_session)
+    return token_response(user)
