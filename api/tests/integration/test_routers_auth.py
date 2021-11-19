@@ -21,7 +21,6 @@ class TestAuth:
         # It should reply with a 401 error
         response = await client.post("/auth/token", data=form)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert False
 
     @pytest.mark.asyncio
     async def test_garbage_token(self, client: AsyncClient):
