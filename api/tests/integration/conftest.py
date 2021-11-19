@@ -4,7 +4,7 @@ from httpx import AsyncClient
 from datetime import timedelta
 
 from api.main import app
-from api.routers.auth import create_access_token
+from api.routers.auth import create_token
 
 USER_ID = "c603ef4f-08f9-4130-a770-3a34defa44b3"
 
@@ -24,7 +24,7 @@ async def client():
 
 @pytest.fixture(scope="session")
 def token():
-    return "Bearer " + create_access_token(data={"sub": USER_ID}, expires_delta=timedelta(minutes=5))
+    return "Bearer " + create_token(sub=USER_ID, typ="session", expires_delta=timedelta(minutes=10))
 
 
 @pytest.fixture(scope="session")
