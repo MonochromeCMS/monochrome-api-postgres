@@ -71,11 +71,9 @@ ifneq ($(native),0)
 	flake8 ./api
 else
 ifneq ($(test_exit),0)
-	$(DOCKER_RUN) $(tag) black ./api --check --diff
-	$(DOCKER_RUN) $(tag) flake8 ./api
+	$(DOCKER_RUN) $(tag) lint
 else
-	-$(DOCKER_RUN) $(tag) black ./api --check --diff
-	-$(DOCKER_RUN) $(tag) flake8 ./api
+	-$(DOCKER_RUN) $(tag) lint
 endif
 endif
 
@@ -84,7 +82,7 @@ format:  ## Format project code
 ifneq ($(native),0)
 	black ./api
 else
-	$(DOCKER_RUN) $(tag) black ./api
+	$(DOCKER_RUN) $(tag) format
 endif
 
 .PHONY: revision
@@ -151,10 +149,11 @@ _test_cleanup:
 .PHONY: _test
 .ONESHELL: _test
 _test:
-	-@echo Running backend tests...
 ifeq ($(test_exit),1)
+	@echo Running tests...
 	$(DOCKER_TEST_RUN) $(tag) python -m pytest --cov api --cov-config=/api/setup.cfg -v api
 else
+	-@echo Running tests...
 	-$(DOCKER_TEST_RUN) -v "`pwd`/htmlcov:/html" $(tag) python -m pytest --cov api --cov-report html:/html --cov-config=/api/setup.cfg -v api
 endif
 
