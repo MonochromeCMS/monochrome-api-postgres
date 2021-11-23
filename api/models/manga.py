@@ -19,7 +19,7 @@ class Status(str, enum.Enum):
 
 class Manga(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_manga_owner"))
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_manga_owner", ondelete="SET NULL"))
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     author = Column(String, nullable=False)

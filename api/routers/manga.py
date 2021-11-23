@@ -101,13 +101,12 @@ get_chapters_responses = {
 
 @router.get("/{manga_id}/chapters", response_model=List[ChapterResponse], responses=get_chapters_responses)
 async def get_manga_chapters(
-    manga_id: UUID,
-    _: Manga = Permission("view", _get_manga),
+    manga: Manga = Permission("view", _get_manga),
     user_principals=Depends(get_active_principals),
     db_session: AsyncSession = Depends(get_db),
 ):
     if await has_permission(user_principals, "view", Chapter.__class_acl__()):
-        return await Chapter.from_manga(db_session, manga_id)
+        return await Chapter.from_manga(db_session, manga.id)
     else:
         raise permission_exception
 

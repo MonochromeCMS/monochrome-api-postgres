@@ -1,17 +1,20 @@
 import os
 import shutil
 
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import auth_responses, Permission
+from .auth import auth_responses, Permission, get_active_principals
+from ..fastapi_permissions import has_permission, permission_exception
 from ..exceptions import NotFoundHTTPException
 from ..config import get_settings
 from ..db import get_db
 from ..models.chapter import Chapter
+from ..models.comment import Comment
 from ..schemas.chapter import ChapterSchema, ChapterResponse, LatestChaptersResponse, DetailedChapterResponse
+from ..schemas.comment import ChapterCommentsResponse
 
 
 settings = get_settings()
@@ -100,3 +103,32 @@ async def update_chapter(
 ):
     await chapter.update(db_session, **payload.dict())
     return chapter
+
+
+get_comments_responses = {
+    **get_responses,
+    200: {
+        "description": "The chapter's comments",
+        "model": ChapterCommentsResponse,
+    },
+}
+
+
+@router.get("/{chapter_id}/comments", response_model=ChapterCommentsResponse, responses=get_comments_responses)
+async def get_chapter_comments(
+    limit: Optional[int] = Query(10, ge=1, le=settings.max_page_limit),
+    offset: Optional[int] = Query(0, ge=0),
+    chapter: Chapter = Permission("view", _get_chapter),
+    user_principals=Depends(get_active_principals),
+    db_session: AsyncSession = Depends(get_db),
+):
+    if await has_permission(user_principals, "view", Chapter.__class_acl__()):
+        count, page = await Comment.from_chapter(db_session, chapter.id, limit, offset)
+        return {
+            "offset": offset,
+            "limit": limit,
+            "results": page,
+            "total": count,
+        }
+    else:
+        raise permission_exception

@@ -11,7 +11,7 @@ from ..fastapi_permissions import Allow
 
 class UploadSession(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), name="fk_session_owner")
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_session_owner", ondelete="CASCADE"))
     chapter_id = Column(UUID(as_uuid=True), ForeignKey("chapter.id", ondelete="CASCADE"))
     manga_id = Column(UUID(as_uuid=True), ForeignKey("manga.id", ondelete="CASCADE"), nullable=False)
     manga = relationship("Manga", back_populates="sessions")

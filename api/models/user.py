@@ -4,6 +4,7 @@ import enum
 from typing import Union
 from pydantic import BaseModel
 from sqlalchemy import Column, String, select, or_, and_, Enum
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,7 @@ class User(Base):
     username = Column(String(15), nullable=False, unique=True)
     email = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
+    comments = relationship("Comment", back_populates="author", cascade="all, delete", passive_deletes=True)
 
     @property
     def principals(self):

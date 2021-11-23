@@ -11,7 +11,7 @@ from ..fastapi_permissions import Allow, Everyone
 
 class Chapter(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_chapter_owner"))
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("user.id", name="fk_chapter_owner", ondelete="SET NULL"))
     name = Column(String, nullable=False)
     scan_group = Column(String, nullable=False)
     volume = Column(Integer, nullable=True)
@@ -22,6 +22,7 @@ class Chapter(Base):
     manga_id = Column(UUID(as_uuid=True), ForeignKey("manga.id", ondelete="CASCADE"), nullable=False)
     manga = relationship("Manga", back_populates="chapters")
     sessions = relationship("UploadSession", back_populates="chapter", cascade="all, delete", passive_deletes=True)
+    comments = relationship("Comment", back_populates="chapter", cascade="all, delete", passive_deletes=True)
 
     __mapper_args__ = {"eager_defaults": True}
 

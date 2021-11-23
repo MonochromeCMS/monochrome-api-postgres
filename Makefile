@@ -30,7 +30,7 @@ ifneq ($(native),0)
 	@export `grep -v '^#' .env | xargs -d '\n'`
 	hypercorn api.main:app -b 0.0.0.0:3000 --reload
 else
-	docker run --rm --name monochrome-api -p 3000:3000 -v $(MEDIA_PATH):$(MEDIA_PATH) --env-file .env $(tag)
+	docker run --rm --name monochrome-api -p 3000:3000 -ti -v `pwd`/media:$(MEDIA_PATH) --env-file .env $(tag)
 endif
 
 .PHONY: up-db

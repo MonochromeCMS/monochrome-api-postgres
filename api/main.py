@@ -5,13 +5,14 @@ from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from .routers import auth, autocomplete, chapter, manga, settings, upload, user
+from .routers import auth, autocomplete, chapter, comment, manga, settings, upload, user
 
 global_settings = get_settings()
 
 app.include_router(auth.router)
 app.include_router(autocomplete.router)
 app.include_router(chapter.router)
+app.include_router(comment.router)
 app.include_router(manga.router)
 app.include_router(settings.router)
 app.include_router(upload.router)
