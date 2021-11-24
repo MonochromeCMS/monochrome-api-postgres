@@ -2,6 +2,7 @@ import logging
 from os import makedirs, path
 from shutil import rmtree
 
+from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi import FastAPI, Request
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
@@ -19,6 +20,7 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(title="Monochrome", version="1.4.3")
 
+Instrumentator(excluded_handlers=["/metrics"]).instrument(app).expose(app, tags=["Status"])
 
 def get_remote_address(request: Request):
     ip = (

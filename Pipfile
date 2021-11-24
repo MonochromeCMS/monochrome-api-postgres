@@ -28,6 +28,7 @@ sqlalchemy = "*"
 python-multipart = "*"
 pillow = ">=8.3.2"
 alembic = "*"
+prometheus-fastapi-instrumentator = "*"
 
 [dev-packages]
 icecream = "*"
