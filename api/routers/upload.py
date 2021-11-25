@@ -386,11 +386,11 @@ def concat_and_cut_images(blob_ids: Iterable[UUID]):
         image.close()
         running_height += image.height
 
-    amount_parts = joined.height // joined.width + 1
+    amount_parts = joined.height // (2 * joined.width) + 1
     parts = []
     for i in range(amount_parts):
-        end_y = min(height, joined.width * (i + 1))
-        part = joined.crop((0, joined.width * i, joined.width, end_y))
+        end_y = min(height, 2 * joined.width * (i + 1))
+        part = joined.crop((0, 2 * joined.width * i, joined.width, end_y))
         parts.append(part)
 
     return parts
