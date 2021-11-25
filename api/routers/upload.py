@@ -396,11 +396,28 @@ def concat_and_cut_images(blob_ids: Iterable[UUID]):
     return parts
 
 
+slice_blobs_responses = {
+    **auth_responses,
+    400: {
+        "description": "There is a problem with the provided page order",
+        **BadRequestHTTPException.open_api("Some pages don't belong to this session")
+    },
+    404: {
+        "description": "The upload session couldn't be found",
+        **NotFoundHTTPException.open_api("Session not found"),
+    },
+    201: {
+        "description": "The created blobs",
+        "model": List[UploadedBlobResponse],
+    },
+}
+
+
 @router.post(
     "/{session_id}/slice",
     status_code=status.HTTP_201_CREATED,
     response_model=List[UploadedBlobResponse],
-    responses=post_blobs_responses,
+    responses=slice_blobs_responses,
 )
 async def slice_pages_in_upload_session(
     payload: List[UUID],
