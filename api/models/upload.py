@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, ForeignKey, delete, String
+from sqlalchemy import Column, ForeignKey, delete, String, select
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,3 +46,10 @@ class UploadedBlob(Base):
     name = Column(String, nullable=False)
     session_id = Column(UUID(as_uuid=True), ForeignKey("uploadsession.id", ondelete="CASCADE"), nullable=False)
     session = relationship("UploadSession", back_populates="blobs")
+
+    @classmethod
+    async def from_session(cls, db_session: AsyncSession, session_id: UUID):
+        stmt = select(cls).where(cls.session_id == session_id)
+        result = await db_session.execute(stmt)
+
+        return result.scalars().all()
