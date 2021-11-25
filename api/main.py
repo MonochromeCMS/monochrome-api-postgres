@@ -4,6 +4,7 @@ from .config import get_settings
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from .routers import auth, autocomplete, chapter, comment, manga, settings, upload, user
 
@@ -18,6 +19,7 @@ app.include_router(settings.router)
 app.include_router(upload.router)
 app.include_router(user.router)
 
+app.mount("/media", StaticFiles(directory=global_settings.media_path), name="media")
 
 origins = global_settings.cors_origins.split(",")
 
