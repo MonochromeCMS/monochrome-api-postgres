@@ -4,7 +4,7 @@ import shutil
 from PIL import Image
 
 from uuid import UUID
-from typing import Optional, List
+from typing import Optional
 from fastapi import APIRouter, Depends, status, Query, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -94,12 +94,12 @@ get_chapters_responses = {
     **get_responses,
     200: {
         "description": "The requested chapters",
-        "model": List[ChapterResponse],
+        "model": list[ChapterResponse],
     },
 }
 
 
-@router.get("/{manga_id}/chapters", response_model=List[ChapterResponse], responses=get_chapters_responses)
+@router.get("/{manga_id}/chapters", response_model=list[ChapterResponse], responses=get_chapters_responses)
 async def get_manga_chapters(
     manga: Manga = Permission("view", _get_manga),
     user_principals=Depends(get_active_principals),

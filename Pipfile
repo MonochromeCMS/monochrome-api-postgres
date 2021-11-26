@@ -33,6 +33,9 @@ prometheus-fastapi-instrumentator = "*"
 [dev-packages]
 icecream = "*"
 ipython = "*"
+isort = "*"
+pyupgrade = "*"
+safety = "*"
 
 [requires]
 python_version = "3.9"

@@ -18,7 +18,7 @@ async def main():
         uuid = uuid4()
 
     if not DB_URL:
-        raise EnvironmentError("A DB_URL is required to add an admin user")
+        raise OSError("A DB_URL is required to add an admin user")
     else:
         DB_URL = DB_URL.replace("+asyncpg", "")
 

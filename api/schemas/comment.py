@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -67,4 +67,4 @@ class DetailedCommentResponse(CommentResponse):
 
 
 class ChapterCommentsResponse(PaginationResponse):
-    results: List[DetailedCommentResponse]
+    results: list[DetailedCommentResponse]

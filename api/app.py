@@ -22,6 +22,7 @@ app = FastAPI(title="Monochrome", version="1.4.3")
 
 Instrumentator(excluded_handlers=["/metrics"]).instrument(app).expose(app, tags=["Status"])
 
+
 def get_remote_address(request: Request):
     ip = (
         request.headers.get("CF-CONNECTING-IP")

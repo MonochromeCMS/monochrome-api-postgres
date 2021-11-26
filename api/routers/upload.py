@@ -1,6 +1,6 @@
 import shutil
 
-from typing import List, Tuple, Iterable
+from typing import Iterable
 from os import path, makedirs, listdir, remove
 from aiofiles import open
 from pyunpack import Archive
@@ -43,7 +43,7 @@ async def _get_upload_session_blobs(session_id: UUID, db_session: AsyncSession =
     )
 
 
-def copy_chapter_to_session(chapter: Chapter, blobs: List[UUID]):
+def copy_chapter_to_session(chapter: Chapter, blobs: list[UUID]):
     chapter_path = path.join(global_settings.media_path, str(chapter.manga_id), str(chapter.id))
     blob_path = path.join(global_settings.media_path, "blobs")
     for i in range(chapter.length):
@@ -123,7 +123,7 @@ async def get_upload_session(session=Permission("view", _get_upload_session_blob
     return session
 
 
-def save_session_image(files: Iterable[Tuple[UUID, str]]):
+def save_session_image(files: Iterable[tuple[UUID, str]]):
     for blob_id, file in files:
         im = Image.open(file)
         im.convert("RGB").save(get_blob_path(blob_id))
@@ -139,25 +139,25 @@ post_blobs_responses = {
     },
     201: {
         "description": "The created blobs",
-        "model": List[UploadedBlobResponse],
+        "model": list[UploadedBlobResponse],
     },
 }
 
 
 def validate_image_extension(name: str):
     extensions = (".jpeg", ".jpg", ".png", ".bmp", ".webp")
-    return any((name.lower().endswith(ext) for ext in extensions))
+    return any(name.lower().endswith(ext) for ext in extensions)
 
 
 @router.post(
     "/{session_id}",
     status_code=status.HTTP_201_CREATED,
-    response_model=List[UploadedBlobResponse],
+    response_model=list[UploadedBlobResponse],
     responses=post_blobs_responses,
 )
 async def upload_pages_to_upload_session(
     session=Permission("edit", _get_upload_session),
-    payload: List[UploadFile] = File(...),
+    payload: list[UploadFile] = File(...),
     db_session: AsyncSession = Depends(get_db),
 ):
     compressed_formats = (
@@ -207,7 +207,7 @@ async def upload_pages_to_upload_session(
     return blobs
 
 
-def delete_session_images(ids: List[UUID]):
+def delete_session_images(ids: list[UUID]):
     for blob_id in ids:
         remove(get_blob_path(blob_id))
 
@@ -239,7 +239,7 @@ async def delete_upload_session(
     return "OK"
 
 
-def commit_session_images(chapter: Chapter, pages: List[UUID], edit: bool):
+def commit_session_images(chapter: Chapter, pages: list[UUID], edit: bool):
     blob_path = path.join(global_settings.media_path, "blobs")
     chapter_path = path.join(global_settings.media_path, str(chapter.manga_id), str(chapter.id))
 
@@ -376,7 +376,7 @@ def concat_and_cut_images(blob_ids: Iterable[UUID]):
     images = [Image.open(get_blob_path(blob_id)) for blob_id in blob_ids]
     height = sum(image.height for image in images)
 
-    if not all((images[0].width == image.width for image in images)):
+    if not all(images[0].width == image.width for image in images):
         raise BadRequestHTTPException("All the images should have the same width")
 
     joined = Image.new('RGB', (images[0].width, height))
@@ -408,7 +408,7 @@ slice_blobs_responses = {
     },
     201: {
         "description": "The created blobs",
-        "model": List[UploadedBlobResponse],
+        "model": list[UploadedBlobResponse],
     },
 }
 
@@ -416,11 +416,11 @@ slice_blobs_responses = {
 @router.post(
     "/{session_id}/slice",
     status_code=status.HTTP_201_CREATED,
-    response_model=List[UploadedBlobResponse],
+    response_model=list[UploadedBlobResponse],
     responses=slice_blobs_responses,
 )
 async def slice_pages_in_upload_session(
-    payload: List[UUID],
+    payload: list[UUID],
     tasks: BackgroundTasks,
     session=Permission("edit", _get_upload_session_blobs),
     db_session: AsyncSession = Depends(get_db),

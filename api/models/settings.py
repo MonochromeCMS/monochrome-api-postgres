@@ -20,7 +20,7 @@ class Settings:
 
     def __init__(self):
         try:
-            file = open(settings_path, "r", encoding="utf8")
+            file = open(settings_path, encoding="utf8")
             self.custom_settings = SettingsSchema(**json.load(file))
         except FileNotFoundError:
             self.custom_settings = SettingsSchema()
