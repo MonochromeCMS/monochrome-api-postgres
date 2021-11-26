@@ -1,28 +1,27 @@
 import shutil
-
+from os import listdir, makedirs, path, remove
 from typing import Iterable
-from os import path, makedirs, listdir, remove
-from aiofiles import open
-from pyunpack import Archive
-from PIL import Image
-
 from uuid import UUID
-from fastapi import APIRouter, Depends, File, UploadFile, status, BackgroundTasks
-from fastapi.responses import JSONResponse
+
+from aiofiles import open
+from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile, status
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from PIL import Image
+from pyunpack import Archive
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import is_connected, auth_responses, Permission, get_active_principals
-from ..fastapi_permissions import has_permission, permission_exception
-from ..exceptions import BadRequestHTTPException, NotFoundHTTPException
 from ..config import get_settings
 from ..db import get_db
-from ..models.user import User
-from ..models.manga import Manga
+from ..exceptions import BadRequestHTTPException, NotFoundHTTPException
+from ..fastapi_permissions import has_permission, permission_exception
 from ..models.chapter import Chapter
-from ..models.upload import UploadSession, UploadedBlob
+from ..models.manga import Manga
+from ..models.upload import UploadedBlob, UploadSession
+from ..models.user import User
 from ..schemas.chapter import ChapterResponse
-from ..schemas.upload import UploadSessionSchema, CommitUploadSession, UploadSessionResponse, UploadedBlobResponse
+from ..schemas.upload import CommitUploadSession, UploadedBlobResponse, UploadSessionResponse, UploadSessionSchema
+from .auth import Permission, auth_responses, get_active_principals, is_connected
 
 global_settings = get_settings()
 
@@ -379,7 +378,7 @@ def concat_and_cut_images(blob_ids: Iterable[UUID]):
     if not all(images[0].width == image.width for image in images):
         raise BadRequestHTTPException("All the images should have the same width")
 
-    joined = Image.new('RGB', (images[0].width, height))
+    joined = Image.new("RGB", (images[0].width, height))
     running_height = 0
     for image in images:
         joined.paste(image, (0, running_height))
@@ -400,7 +399,7 @@ slice_blobs_responses = {
     **auth_responses,
     400: {
         "description": "There is a problem with the provided page order",
-        **BadRequestHTTPException.open_api("Some pages don't belong to this session")
+        **BadRequestHTTPException.open_api("Some pages don't belong to this session"),
     },
     404: {
         "description": "The upload session couldn't be found",

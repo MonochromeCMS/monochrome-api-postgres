@@ -7,6 +7,7 @@ name = "pypi"
 # Linting/Formatting
 flake8 = "*"
 black = "*"
+isort = "*"
 # Testing
 httpx = "*"
 pytest = "*"

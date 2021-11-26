@@ -1,8 +1,9 @@
-from os import getenv
 import asyncio
+from os import getenv
+from uuid import uuid4
+
 import asyncpg
 from passlib.hash import bcrypt
-from uuid import uuid4
 
 
 async def main():

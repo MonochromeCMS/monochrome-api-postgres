@@ -1,3 +1,3 @@
-from . import base, manga, chapter, comment, upload, user
+from . import base, chapter, comment, manga, upload, user
 
 metadata = base.Base.metadata

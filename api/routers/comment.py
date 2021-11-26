@@ -1,14 +1,14 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import auth_responses, Permission, get_connected_user
-from ..exceptions import NotFoundHTTPException, BadRequestHTTPException
 from ..db import get_db
-from ..models.user import User
+from ..exceptions import BadRequestHTTPException, NotFoundHTTPException
 from ..models.comment import Comment
-from ..schemas.comment import CommentSchema, CommentEditSchema, CommentResponse
-
+from ..models.user import User
+from ..schemas.comment import CommentEditSchema, CommentResponse, CommentSchema
+from .auth import Permission, auth_responses, get_connected_user
 
 router = APIRouter(prefix="/comment", tags=["Comment"])
 
@@ -21,7 +21,7 @@ post_responses = {
     **auth_responses,
     400: {
         "description": "The replied comment is not valid",
-        **BadRequestHTTPException.open_api("Comment to reply to not valid")
+        **BadRequestHTTPException.open_api("Comment to reply to not valid"),
     },
     201: {
         "description": "The created comment",

@@ -1,7 +1,8 @@
-import pytest
 import asyncio
-from httpx import AsyncClient
 from datetime import timedelta
+
+import pytest
+from httpx import AsyncClient
 
 from api.main import app
 from api.routers.auth import create_token

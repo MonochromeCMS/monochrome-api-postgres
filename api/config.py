@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache
 
-from pydantic import BaseSettings, AnyUrl, Field
+from pydantic import AnyUrl, BaseSettings, Field
 
 log = logging.getLogger(__name__)
 

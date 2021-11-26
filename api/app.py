@@ -2,17 +2,16 @@ import logging
 from os import makedirs, path
 from shutil import rmtree
 
-from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi import FastAPI, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from .models.upload import UploadSession
-
-from .exceptions import rate_limit_exceeded_handler
-from .db import engine, get_db
 from .config import get_settings
+from .db import engine, get_db
+from .exceptions import rate_limit_exceeded_handler
+from .models.upload import UploadSession
 
 global_settings = get_settings()
 

@@ -1,15 +1,15 @@
-import uuid
 import enum
-
+import uuid
 from typing import Union
+
 from pydantic import BaseModel
-from sqlalchemy import Column, String, select, or_, and_, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Enum, String, and_, or_, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import relationship
 
-from .base import Base
 from ..fastapi_permissions import Allow, Everyone
+from .base import Base
 
 
 class Role(str, enum.Enum):

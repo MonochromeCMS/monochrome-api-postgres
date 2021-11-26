@@ -1,12 +1,12 @@
 import uuid
 
-from sqlalchemy import Column, String, DateTime, func, select, ForeignKey
-from sqlalchemy.orm import relationship, joinedload
+from sqlalchemy import Column, DateTime, ForeignKey, String, func, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, relationship
 
+from ..fastapi_permissions import Allow, Authenticated, Everyone
 from .base import Base
-from ..fastapi_permissions import Allow, Everyone, Authenticated
 
 
 class Comment(Base):

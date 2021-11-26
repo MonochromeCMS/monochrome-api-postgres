@@ -1,10 +1,9 @@
 from fastapi import APIRouter
 
-from .auth import auth_responses, Permission
 from ..config import get_settings
 from ..models.settings import Settings
 from ..schemas.settings import SettingsSchema
-
+from .auth import Permission, auth_responses
 
 global_settings = get_settings()
 

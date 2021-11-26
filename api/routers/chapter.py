@@ -1,21 +1,20 @@
 import os
 import shutil
-
 from typing import Optional
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .auth import auth_responses, Permission, get_active_principals
-from ..fastapi_permissions import has_permission, permission_exception
-from ..exceptions import NotFoundHTTPException
 from ..config import get_settings
 from ..db import get_db
+from ..exceptions import NotFoundHTTPException
+from ..fastapi_permissions import has_permission, permission_exception
 from ..models.chapter import Chapter
 from ..models.comment import Comment
-from ..schemas.chapter import ChapterSchema, ChapterResponse, LatestChaptersResponse, DetailedChapterResponse
+from ..schemas.chapter import ChapterResponse, ChapterSchema, DetailedChapterResponse, LatestChaptersResponse
 from ..schemas.comment import ChapterCommentsResponse
-
+from .auth import Permission, auth_responses, get_active_principals
 
 settings = get_settings()
 

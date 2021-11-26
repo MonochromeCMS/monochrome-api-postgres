@@ -1,10 +1,9 @@
-import os
 import json
+import os
 
-from ..fastapi_permissions import Allow, Everyone
 from ..config import get_settings
+from ..fastapi_permissions import Allow, Everyone
 from ..schemas.settings import SettingsSchema
-
 
 global_settings = get_settings()
 settings_path = os.path.join(global_settings.media_path, "settings.json")

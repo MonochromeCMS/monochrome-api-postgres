@@ -1,13 +1,13 @@
-import uuid
 import enum
+import uuid
 
-from sqlalchemy import Column, String, select, Numeric, Enum, DateTime, func, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Numeric, String, func, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import relationship
 
-from .base import Base
 from ..fastapi_permissions import Allow, Everyone
+from .base import Base
 
 
 class Status(str, enum.Enum):

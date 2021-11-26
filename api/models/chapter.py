@@ -1,12 +1,12 @@
 import uuid
 
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func, select, Float, Boolean
-from sqlalchemy.orm import relationship, joinedload
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, func, select
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, relationship
 
-from .base import Base
 from ..fastapi_permissions import Allow, Everyone
+from .base import Base
 
 
 class Chapter(Base):

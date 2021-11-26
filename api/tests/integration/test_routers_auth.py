@@ -1,6 +1,6 @@
 from datetime import timedelta
-import pytest
 
+import pytest
 from fastapi import status
 from httpx import AsyncClient
 

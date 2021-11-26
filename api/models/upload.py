@@ -1,12 +1,12 @@
 import uuid
 
-from sqlalchemy import Column, ForeignKey, delete, String, select
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, String, delete, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import relationship
 
-from .base import Base
 from ..fastapi_permissions import Allow
+from .base import Base
 
 
 class UploadSession(Base):

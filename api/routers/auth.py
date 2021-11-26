@@ -2,24 +2,19 @@ from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
-from fastapi import Depends, APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt, ExpiredSignatureError
+from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..fastapi_permissions import (
-    Authenticated,
-    Everyone,
-    configure_permissions,
-)
 
 from ..app import limiter
-from ..db import get_db
 from ..config import get_settings
+from ..db import get_db
 from ..exceptions import AuthFailedHTTPException, PermissionsHTTPException
-from ..schemas.user import TokenResponse, TokenContent, RefreshToken
+from ..fastapi_permissions import Authenticated, Everyone, configure_permissions
 from ..models.user import User
-
+from ..schemas.user import RefreshToken, TokenContent, TokenResponse
 
 auth_responses = {
     401: {

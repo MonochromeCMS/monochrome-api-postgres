@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_db
 from ..models.chapter import Chapter
 
-
 router = APIRouter(prefix="/autocomplete", tags=["Autocomplete"])
 
 
