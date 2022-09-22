@@ -1,4 +1,7 @@
 # Monochrome
+
+> **WARNING:** This api has been deprecated in favor of (monochrome-api)[https://github.com/MonochromeCMS/monochrome-api] which supports Postgres among other database and file storage providers.
+
 Monochrome's API, implemented with a PostgreSQL backend and FS image storage.
 
 Most users will prefer the [Monochrome full stack](https://github.com/MonochromeCMS/Monochrome), which contains the API, the frontend and the backend.
